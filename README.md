@@ -1,4 +1,4 @@
-[README_DFS_Bloques.md](https://github.com/user-attachments/files/28183975/README_DFS_Bloques.md)
+
 # Proyecto Sistemas Distribuidos - DFS-Bloques
 
 Sistema de archivos distribuido minimalista basado en bloques, desarrollado para el curso **Arquitecturas de Nube y Sistemas Distribuidos**.
