@@ -1,0 +1,81 @@
+services:
+  namenode:
+    build: .
+    container_name: dfs-namenode
+    command: uvicorn namenode.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "${NAMENODE_PORT_HOST:-8000}:8000"
+    environment:
+      METADATA_DB: /data/metadata.json
+      REPLICATION_FACTOR: ${REPLICATION_FACTOR:-2}
+      DEFAULT_USERNAME: ${DEFAULT_USERNAME:-santiago}
+      DEFAULT_PASSWORD: ${DEFAULT_PASSWORD:-1234}
+      REQUEST_TIMEOUT: ${REQUEST_TIMEOUT:-5}
+    volumes:
+      - ./runtime/namenode:/data
+    networks:
+      - dfs-net
+
+  datanode1:
+    build: .
+    container_name: dfs-datanode1
+    command: uvicorn datanode.main:app --host 0.0.0.0 --port 8001
+    depends_on:
+      - namenode
+    ports:
+      - "${DATANODE1_PORT_HOST:-8001}:8001"
+    environment:
+      NODE_ID: dn1
+      NODE_PORT: 8001
+      STORAGE_PATH: /data/blocks
+      NAMENODE_URL: http://namenode:8000
+      BASE_URL: http://datanode1:8001
+      CLIENT_URL: ${DATANODE1_CLIENT_URL:-http://localhost:8001}
+    volumes:
+      - ./runtime/datanode1:/data/blocks
+    networks:
+      - dfs-net
+
+  datanode2:
+    build: .
+    container_name: dfs-datanode2
+    command: uvicorn datanode.main:app --host 0.0.0.0 --port 8002
+    depends_on:
+      - namenode
+    ports:
+      - "${DATANODE2_PORT_HOST:-8002}:8002"
+    environment:
+      NODE_ID: dn2
+      NODE_PORT: 8002
+      STORAGE_PATH: /data/blocks
+      NAMENODE_URL: http://namenode:8000
+      BASE_URL: http://datanode2:8002
+      CLIENT_URL: ${DATANODE2_CLIENT_URL:-http://localhost:8002}
+    volumes:
+      - ./runtime/datanode2:/data/blocks
+    networks:
+      - dfs-net
+
+  datanode3:
+    build: .
+    container_name: dfs-datanode3
+    command: uvicorn datanode.main:app --host 0.0.0.0 --port 8003
+    depends_on:
+      - namenode
+    ports:
+      - "${DATANODE3_PORT_HOST:-8003}:8003"
+    environment:
+      NODE_ID: dn3
+      NODE_PORT: 8003
+      STORAGE_PATH: /data/blocks
+      NAMENODE_URL: http://namenode:8000
+      BASE_URL: http://datanode3:8003
+      CLIENT_URL: ${DATANODE3_CLIENT_URL:-http://localhost:8003}
+    volumes:
+      - ./runtime/datanode3:/data/blocks
+    networks:
+      - dfs-net
+
+networks:
+  dfs-net:
+    driver: bridge
